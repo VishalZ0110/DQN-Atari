@@ -7,6 +7,7 @@ Usage:
 
 import os
 import argparse
+from datetime import datetime
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -96,8 +97,18 @@ def train(cfg, device):
     paths_cfg = cfg["paths"]
 
     short_name = env_short_name(env_cfg["name"])
-    os.makedirs(paths_cfg["checkpoint_dir"], exist_ok=True)
-    os.makedirs(paths_cfg["video_dir"], exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_name = f"{short_name}_{timestamp}"
+
+    run_checkpoint_dir = os.path.join(paths_cfg["checkpoint_dir"], run_name)
+    run_video_dir = os.path.join(paths_cfg["video_dir"], run_name)
+    train_eval_dir = os.path.join(run_video_dir, "train_eval")
+
+    os.makedirs(run_checkpoint_dir, exist_ok=True)
+    os.makedirs(train_eval_dir, exist_ok=True)
+    print(f"Run: {run_name}")
+    print(f"  Checkpoints -> {run_checkpoint_dir}")
+    print(f"  Videos      -> {run_video_dir}")
 
     num_envs = env_cfg["num_envs"]
     envs = gym.vector.AsyncVectorEnv(
@@ -206,16 +217,16 @@ def train(cfg, device):
         if global_step % update_freq == 0:
             q_online, q_target = sync_weights(q_online, q_target)
 
-        # --- Mid-training evaluation ---
-        if global_step % eval_freq == 0 and global_step > 0:
+        # --- Mid-training evaluation (only after training has started) ---
+        if training and global_step % eval_freq == 0 and global_step > 0:
             ckpt_path = os.path.join(
-                paths_cfg["checkpoint_dir"], f"{short_name}_step_{global_step}.pt"
+                run_checkpoint_dir, f"step_{global_step}.pt"
             )
             torch.save(q_online.state_dict(), ckpt_path)
 
             if eval_cfg["save_video"]:
                 vid_path = os.path.join(
-                    paths_cfg["video_dir"], f"train_eval_step_{global_step}.mp4"
+                    train_eval_dir, f"step_{global_step}.mp4"
                 )
                 eval_reward = eval_single_env_video(
                     q_online,
@@ -242,11 +253,10 @@ def train(cfg, device):
     # --- Cleanup ---
     envs.close()
 
-    final_ckpt = os.path.join(paths_cfg["checkpoint_dir"], f"{short_name}_final.pt")
+    final_ckpt = os.path.join(run_checkpoint_dir, "final.pt")
     torch.save(q_online.state_dict(), final_ckpt)
     print(f"Final checkpoint saved to {final_ckpt}")
 
-    # Save reward / loss plots
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     axes[0].plot(episode_rewards)
     axes[0].set_title("Episode Rewards")
@@ -255,7 +265,7 @@ def train(cfg, device):
     axes[1].set_title("Episode Losses")
     axes[1].set_xlabel("Episode")
     plt.tight_layout()
-    plot_path = os.path.join(paths_cfg["video_dir"], f"{short_name}_training_curves.png")
+    plot_path = os.path.join(run_video_dir, "training_curves.png")
     plt.savefig(plot_path, dpi=150)
     plt.close()
     print(f"Training curves saved to {plot_path}")

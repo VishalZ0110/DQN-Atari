@@ -28,7 +28,10 @@ def evaluate(cfg, checkpoint_path, device):
     fps = eval_cfg["video_fps"]
     short_name = env_short_name(env_cfg["name"])
 
-    os.makedirs(paths_cfg["video_dir"], exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    eval_dir = os.path.join(paths_cfg["video_dir"], f"eval_{short_name}_{timestamp}")
+    os.makedirs(eval_dir, exist_ok=True)
+    print(f"Eval output -> {eval_dir}")
 
     model = DQN(num_actions=env_cfg["num_actions"]).to(device)
     model.load_state_dict(torch.load(checkpoint_path, map_location=device, weights_only=True))
@@ -83,8 +86,7 @@ def evaluate(cfg, checkpoint_path, device):
     for i, r in enumerate(env_rewards):
         print(f"  Env {i}: reward = {r:.2f} | frames = {len(all_env_frames[i])}")
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    video_path = os.path.join(paths_cfg["video_dir"], f"eval_{short_name}_{timestamp}.mp4")
+    video_path = os.path.join(eval_dir, "grid.mp4")
     save_grid_video(all_env_frames, video_path, fps=fps, grid_cols=grid_cols)
     print(f"Grid video saved to {video_path}")
 
