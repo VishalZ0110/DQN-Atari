@@ -1,5 +1,11 @@
 # DQN Atari
 
+<p align="center">
+  <img src="assets/demo.gif" alt="Trained DQN agent playing Mario Bros" width="320">
+  <br>
+  <em>Gameplay by a trained DQN agent on Mario Bros</em>
+</p>
+
 A modular Deep Q-Network implementation for training agents to play Atari games directly from raw pixel input, using PyTorch and Gymnasium.
 
 ## Overview
