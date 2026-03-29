@@ -29,12 +29,18 @@ The screen wraps horizontally: exiting one side makes the character appear on th
 
 Common enemies include:
 
-- **Shellcreeper** (turtle)
-- **Sidestepper** (crab that requires two hits)
-- **Fighter Fly** (jumping insect)
-- **Slipice** (freezes floors and makes them slippery)
+| Enemy | Sprite | Description |
+| --- | --- | --- |
+| **Shellcreeper** | <img src="assets/Shellcreeper.png" width="80"> | A turtle that walks along platforms. One hit from below flips it. |
+| **Sidestepper** | <img src="assets/Sidestepper.png" width="80"> | A crab that requires two hits from below before it can be kicked. |
+| **Fighter Fly** | <img src="assets/Fighter_Fly.png" width="80"> | A jumping insect that bounces across platforms. |
+| **Slipice** | <img src="assets/Slipice.png" width="80"> | Freezes floors and makes them slippery. Worth 500 points when punched. |
 
-Additional hazards include **fireballs** that move around the screen and must be avoided.
+Additional hazards:
+
+| Hazard | Sprite | Description |
+| --- | --- | --- |
+| **Fireball** | <img src="assets/Fireball.png" width="80"> | Moves around the screen and must be avoided at all costs. |
 
 ---
 
@@ -51,12 +57,12 @@ A **POW block** sits near the bottom center of the stage.
 
 Points are earned through several actions:
 
-| Action | Points |
-| --- | --- |
-| Kick enemy off platform | 800 |
-| Collect bonus wafer (appears after enemy defeat) | 800 |
-| Collect coin in bonus stage | 800 |
-| Punch the enemy Slipice | 500 |
+| Action | Points | Note |
+| --- | --- | --- |
+| Kick enemy off platform | 800 | |
+| Collect bonus wafer <img src="assets/Bonus_Wafer.png" width="40"> | 800 | Appears after defeating an enemy |
+| Collect coin in bonus stage | 800 | |
+| Punch the enemy Slipice | 500 | |
 
 Occasionally a **coin phase** occurs where enemies disappear and the player has about **15 seconds to collect hanging coins for points**.
 
