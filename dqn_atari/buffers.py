@@ -28,7 +28,7 @@ class MultiEnvFrameBuffer:
     def preprocess(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         frame = cv2.resize(frame, (84, 84), interpolation=cv2.INTER_AREA)
-        return frame
+        return frame / 255.
 
     def add(self, env_frames):
         for env_id in range(self.num_envs):
@@ -37,7 +37,7 @@ class MultiEnvFrameBuffer:
 
     def get_stack(self):
         stack = np.stack([np.stack(frames) for _, frames in self.frames.items()])
-        return torch.from_numpy(stack).to(dtype=torch.uint8)
+        return torch.from_numpy(stack).float()
 
 class MultiEnvReplayBuffer:
     def __init__(self, num_envs, state_shape=(4, 84, 84), max_size=1000000, batch_size=64, device="cpu"):
@@ -49,8 +49,8 @@ class MultiEnvReplayBuffer:
         self.size = 0
 
         # Preallocate memory with PyTorch tensors
-        self.states = torch.zeros((max_size, *state_shape), dtype=torch.uint8)
-        self.next_states = torch.zeros((max_size, *state_shape), dtype=torch.uint8)
+        self.states = torch.zeros((max_size, *state_shape), dtype=torch.float32)
+        self.next_states = torch.zeros((max_size, *state_shape), dtype=torch.float32)
         self.actions = torch.zeros((max_size,), dtype=torch.uint8)
         self.rewards = torch.zeros((max_size,), dtype=torch.float32)
         self.dones = torch.zeros((max_size,), dtype=torch.bool)
@@ -76,10 +76,10 @@ class MultiEnvReplayBuffer:
         non_blocking = self.device in ['cuda', 'mps']
 
         return {
-            "state": self.states[idxs].float().div_(255.).to(self.device, non_blocking=non_blocking),
+            "state": self.states[idxs].to(self.device, non_blocking=non_blocking),
             "action": self.actions[idxs].long().to(self.device, non_blocking=non_blocking),
             "reward": self.rewards[idxs].to(self.device, non_blocking=non_blocking),
-            "next_state": self.next_states[idxs].float().div_(255.).to(self.device, non_blocking=non_blocking),
+            "next_state": self.next_states[idxs].to(self.device, non_blocking=non_blocking),
             "done": self.dones[idxs].float().to(self.device, non_blocking=non_blocking),
         }
 

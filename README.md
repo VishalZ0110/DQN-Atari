@@ -79,6 +79,9 @@ python -m dqn_atari.train --config configs/mario_bros.yaml --device cuda
 
 Checkpoints are saved to `checkpoints/` and training curves to `videos/`.
 
+### Pretrained Weights
+Pretrained weights for Mario Bros can be found at [Checkpoints](https://drive.google.com/file/d/1ZoR2gOOGdYi4kdgWtTy8P3tkTMCO7tT2/view?usp=sharing).
+
 ### Evaluate
 
 Run multiple environments in parallel and produce a grid video of all gameplays:
